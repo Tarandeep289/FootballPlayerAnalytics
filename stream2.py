@@ -8,124 +8,91 @@ st.set_page_config(
     page_icon='⚽',
     initial_sidebar_state='expanded'
 )
-df=pd.read_csv('FC26_20250921.csv')
-# st.dataframe(df)
-# Sidebar
+df=pd.read_csv(r'C:\Users\ASUS\FootballPlayerAnalyticsProject\Streamlit2\FC26_cleaned.csv')
+
+
 st.markdown("""
 <style>
 
-/* ===========================================================
-                    GOOGLE FONT
-=========================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-
-html, body, [class*="css"]{
-    font-family: 'Poppins', sans-serif;
-}
-
-/* ===========================================================
-                    APP BACKGROUND
-=========================================================== */
-
+/* ---------- APP ---------- */
 .stApp{
-    background:#F8FAFC;
+    background:linear-gradient(180deg,#EDF7ED,#F8FAFC);
 }
 
-/* ===========================================================
-                    SIDEBAR
-=========================================================== */
-
+/* ---------- SIDEBAR ---------- */
 section[data-testid="stSidebar"]{
-    background:#0F172A;
-    border-right:3px solid #16A34A;
+    background:linear-gradient(180deg,#0B1F33,#12344D);
+    border-right:4px solid #2ECC71;
 }
 
-/* Sidebar text */
-
-section[data-testid="stSidebar"] *{
-    color:white;
+/* Sidebar headings only */
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3{
+    color:#FFD54F !important;
 }
 
-/* ===========================================================
-                    OPTION MENU
-=========================================================== */
+/* Sidebar labels */
+section[data-testid="stSidebar"] label{
+    color:white !important;
+    font-weight:600;
+}
 
+/* Option Menu */
 .nav-link{
-    font-size:18px !important;
-    font-weight:600 !important;
     border-radius:12px !important;
-    margin-bottom:8px !important;
+    margin:6px 0;
+    font-size:17px !important;
+    font-weight:600 !important;
     transition:0.3s;
 }
 
 .nav-link:hover{
-    background:#16A34A !important;
-    color:white !important;
+    background:#2ECC71 !important;
+    transform:translateX(5px);
 }
 
 .nav-link-selected{
-    background:#16A34A !important;
+    background:#27AE60 !important;
     color:white !important;
-    font-weight:bold !important;
+    box-shadow:0 5px 15px rgba(0,0,0,.3);
 }
 
-/* ===========================================================
-                    SIDEBAR HEADINGS
-=========================================================== */
-
-h3{
-    color:#F59E0B !important;
-    font-weight:700;
+/* Multiselect */
+div[data-baseweb="select"]{
+    border-radius:10px;
 }
 
-/* ===========================================================
-                    MAIN TITLE
-=========================================================== */
-
-h1{
-    color:#0F172A;
-    font-size:46px !important;
-    font-weight:800 !important;
+/* Keep clear (×) icon visible */
+div[data-baseweb="select"] svg{
+    fill:#444 !important;
 }
 
-/* ===========================================================
-                    SUBTITLE
-=========================================================== */
-
-h5{
-    color:#475569;
-    font-size:18px !important;
-    font-style:italic;
-}
-
-/* ===========================================================
-                    IMAGE
-=========================================================== */
+/* ---------- IMAGE ---------- */
 
 img{
-    border-radius:18px;
-    box-shadow:0px 8px 25px rgba(0,0,0,0.25);
+    border-radius:20px;
+    border:5px solid white;
+    box-shadow:0 15px 30px rgba(0,0,0,.25);
 }
 
-/* ===========================================================
-                    KPI CARDS
-=========================================================== */
+/* ---------- KPI CARD ---------- */
 
 .kpi-card{
 
-    background:white;
+    background:linear-gradient(135deg,#ffffff,#f4fff6);
 
     border-radius:18px;
 
-    padding:22px;
+    padding:25px;
 
     text-align:center;
 
-    box-shadow:0px 5px 18px rgba(0,0,0,0.15);
+    border-left:8px solid #27AE60;
 
-    border-top:6px solid #16A34A;
+    box-shadow:0 10px 25px rgba(0,0,0,.12);
 
-    transition:0.3s;
+    transition:0.35s;
 
 }
 
@@ -133,126 +100,49 @@ img{
 
     transform:translateY(-8px);
 
-    box-shadow:0px 12px 28px rgba(0,0,0,0.25);
+    box-shadow:0 18px 35px rgba(39,174,96,.35);
+
+}
+
+.kpi-icon{
+
+    font-size:36px;
 
 }
 
 .kpi-title{
 
-    color:#0F172A;
+    margin-top:10px;
 
     font-size:18px;
 
-    font-weight:700;
-
-}
-
-.kpi-value{
-
-    color:#16A34A;
-
-    font-size:34px;
-
-    font-weight:800;
-
-}
-
-/* ===========================================================
-                    FILTERS
-=========================================================== */
-
-div[data-baseweb="select"]{
-
-    border-radius:12px;
-
-}
-
-/* ===========================================================
-                    BUTTONS
-=========================================================== */
-
-.stButton>button{
-
-    background:#16A34A;
-
-    color:white;
-
-    border:none;
-
-    border-radius:10px;
+    color:#555;
 
     font-weight:600;
 
 }
 
-.stButton>button:hover{
+.kpi-value{
 
-    background:#15803D;
+    margin-top:8px;
 
-}
+    font-size:34px;
 
-/* ===========================================================
-                    DATAFRAME
-=========================================================== */
+    color:#0B3C2D;
 
-[data-testid="stDataFrame"]{
-
-    border-radius:15px;
-
-    overflow:hidden;
-
-    box-shadow:0px 5px 15px rgba(0,0,0,0.15);
+    font-weight:800;
 
 }
 
-/* ===========================================================
-                    METRIC
-=========================================================== */
-
-[data-testid="metric-container"]{
-
-    background:white;
-
-    border-radius:15px;
-
-    padding:15px;
-
-    box-shadow:0px 5px 15px rgba(0,0,0,0.12);
-
-}
-
-/* ===========================================================
-                    HR
-=========================================================== */
-
-hr{
-
-    border:1px solid #16A34A;
-
-}
-
-/* ===========================================================
-                    SCROLLBAR
-=========================================================== */
+/* ---------- SCROLLBAR ---------- */
 
 ::-webkit-scrollbar{
-
-    width:10px;
-
+    width:8px;
 }
 
 ::-webkit-scrollbar-thumb{
-
-    background:#16A34A;
-
+    background:#2ECC71;
     border-radius:20px;
-
-}
-
-::-webkit-scrollbar-track{
-
-    background:#F1F5F9;
-
 }
 
 </style>
@@ -268,15 +158,41 @@ with st.sidebar:
         filtered=filtered[filtered['league_name'].isin(league)]# use filtered term from now onwards
     if club:
         filtered=filtered[filtered['club_name'].isin(club)]
+
+
 # Home page
 if opt=='🏠 Home':
-    st.title('⚽ Football Player Analytics Dashboard')
-    st.markdown('##### ***Explore player performance, market value, club statistics, league comparisons, and transfer insights using interactive visualizations.***')
+    st.markdown("""
+<div style="text-align:center; padding:15px;">
+
+<h1 style="
+color:#0B3C2D;
+font-size:52px;
+font-weight:800;
+margin-bottom:10px;
+text-shadow:2px 2px 8px rgba(0,0,0,0.15);
+">
+⚽ Football Player Analytics Dashboard
+</h1>
+
+<p style="
+font-size:20px;
+color:#555;
+font-style:italic;
+margin-top:0;
+">
+Explore player performance, market value, club statistics,
+league comparisons, and transfer insights using interactive visualizations.
+</p>
+
+</div>
+""", unsafe_allow_html=True)
+
     st.image(
             r"C:\Users\ASUS\FootballPlayerAnalyticsProject\Streamlit2\football-stadium-inside-at-night-with-lights-post-production-free-photo.jpg",   # Replace with your image path
             use_container_width=True)
     # KPI Cards
-    players=filtered['short_name'].nunique()
+    players=filtered['short_name'].shape[0]
     leagues=filtered['league_name'].nunique()
     clubs=filtered['club_name'].nunique()
     avg_value=filtered['value_eur'].mean()
@@ -284,65 +200,338 @@ if opt=='🏠 Home':
     avg_potential = filtered["potential"].mean()
     total_wages = filtered["wage_eur"].sum()
 
-    #row1
+    # ===================== KPI CARDS =====================
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+# ---------- First Row ----------
     col1, col2, col3, col4 = st.columns(4)
 
-with col1:
-    st.markdown(f"""
+    with col1:
+        st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">👤 Players</div>
+        <div class="kpi-icon">👤</div>
+        <div class="kpi-title">Total Players</div>
         <div class="kpi-value">{players:,}</div>
     </div>
     """, unsafe_allow_html=True)
 
-with col2:
-    st.markdown(f"""
+    with col2:
+        st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">🌍 Leagues</div>
+        <div class="kpi-icon">🌍</div>
+        <div class="kpi-title">Leagues</div>
         <div class="kpi-value">{leagues}</div>
     </div>
     """, unsafe_allow_html=True)
 
-with col3:
-    st.markdown(f"""
+    with col3:
+        st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">🏟 Clubs</div>
+        <div class="kpi-icon">🏟️</div>
+        <div class="kpi-title">Clubs</div>
         <div class="kpi-value">{clubs}</div>
     </div>
     """, unsafe_allow_html=True)
 
-with col4:
-    st.markdown(f"""
+    with col4:
+        st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">💰 Avg Value</div>
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-title">Avg Market Value</div>
         <div class="kpi-value">€{avg_value/1e6:.2f}M</div>
     </div>
     """, unsafe_allow_html=True)
 
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    #row 2
+# ---------- Second Row ----------
     col5, col6, col7 = st.columns(3)
 
-with col5:
-    st.markdown(f"""
+    with col5:
+        st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">⭐ Avg Overall</div>
+        <div class="kpi-icon">⭐</div>
+        <div class="kpi-title">Avg Overall</div>
         <div class="kpi-value">{avg_overall:.1f}</div>
     </div>
     """, unsafe_allow_html=True)
 
-with col6:
-    st.markdown(f"""
+    with col6:
+        st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">🚀 Avg Potential</div>
+        <div class="kpi-icon">🚀</div>
+        <div class="kpi-title">Avg Potential</div>
         <div class="kpi-value">{avg_potential:.1f}</div>
     </div>
     """, unsafe_allow_html=True)
 
-with col7:
-    st.markdown(f"""
+    with col7:
+        st.markdown(f"""
     <div class="kpi-card">
-        <div class="kpi-title">💵 Total Wages</div>
+        <div class="kpi-icon">💵</div>
+        <div class="kpi-title">Total Weekly Wages</div>
         <div class="kpi-value">€{total_wages/1e9:.2f}B</div>
     </div>
     """, unsafe_allow_html=True)
+
+
+
+  # Dataset page
+# streamlit of dataset page
+elif opt=='📄 Dataset':
+    # st.title('📊 Dataset Explorer')
+    # st.text('Explore the complete football player dataset with filtering, summary information, and data preview.')
+    st.markdown("""
+<div style="
+text-align:center;
+padding:10px;
+">
+
+<h1 style="
+font-size:45px;
+color:#0B3C2D;
+font-weight:800;
+">
+📊 Dataset Explorer
+</h1>
+
+<p style="
+font-size:20px;
+color:#555;
+font-style:italic;
+">
+Explore football player records, column information,
+statistical summaries, and filtered data insights.
+</p>
+
+</div>
+""", unsafe_allow_html=True)
+# Dataset information bar
+    num_rows=filtered.shape[0]
+    num_cols=filtered.shape[1]
+    st.markdown(f"""
+<div class="dataset-info">
+    <span class="dataset-info-item">📋 <strong>Rows:</strong> {num_rows}</span>
+    <span class="dataset-info-item">📑 <strong>Columns:</strong> {num_cols}</span>
+    <span class="dataset-info-item">🌍 <strong>Leagues:</strong> {filtered['league_name'].nunique()}</span>
+    <span class="dataset-info-item">🏟️ <strong>Clubs:</strong> {filtered['club_name'].nunique()}</span>
+    <span class="dataset-info-item">🌎 <strong>Nationalities:</strong> {filtered['nationality_name'].nunique()}</span>
+</div>
+""", unsafe_allow_html=True)
+    # st.write(filtered.columns.tolist())
+
+    # ---------- Tabs: Data | Columns | Summary ----------
+    tab1, tab2, tab3 = st.tabs(['📂 Data Preview','📋 Column Information','📈 Summary'])
+    # TAB 1: DATA PREVIEW
+    with tab1:
+        col_left,col_right=st.columns([3,1])
+        with col_left:
+            st.subheader('Preview Filtered Data')
+        with col_right:
+            #slider for no. of rows to display
+            n_rows=st.slider('Rows to show',min_value=5,max_value=101,step=20,value=20)
+        # display the first n rows
+        st.dataframe(filtered.head(n_rows),use_container_width=True)
+        #optionally display the last 10 rows
+        with st.expander('Show last 10 rows'):
+            st.dataframe(filtered.tail(10),use_container_width=True)
+
+        # Download button for the filtered data
+        csv=filtered.to_csv(index=False,encoding='utf-8')
+        st.download_button(
+            label='📥 Download filtered data as csv',
+            data=csv,
+            file_name='FootballPlayerAnalytics_Cleaned.csv',
+            mime='text/csv',
+            use_container_width=True
+        )
+    # TAB 2: COLUMN DETAILS
+    with tab2:
+        # compute missing values and give the column a clear name
+        column_info=pd.DataFrame({
+            'Column Name':filtered.columns,
+            'Data Type':filtered.dtypes.astype(str),
+            'Missing Values':filtered.isna().sum()
+        })
+        st.dataframe(
+        column_info,
+        use_container_width=True,
+        height=400,
+        hide_index=True)
+
+    # TAB 3: SUMMARY
+    with tab3:
+        st.subheader('Statistical Summary')
+
+    # Separate numeric and categorical columns
+        num_cols = filtered.select_dtypes(include=['int64','float64']).columns.tolist()
+        cat_cols = filtered.select_dtypes(include=['object','category']).columns.tolist()
+
+    # Numeric Summary
+        if num_cols:
+            st.markdown('#### 📊 Numeric Columns')
+
+            st.dataframe(
+               filtered[num_cols].describe(),
+               use_container_width=True
+        )
+
+    # Categorical Summary
+        if cat_cols:
+           st.markdown('#### 🏷️ Categorical Columns')
+
+           categorical_cols = [
+            "league_name",
+            "club_name",
+            "nationality_name",
+            "player_positions"
+        ]
+
+        for col in categorical_cols:
+            if col in filtered.columns:
+
+                with st.expander(f"Top values in '{col}'"):
+
+                    top_values = (
+                        filtered[col]
+                        .dropna()
+                        .value_counts()
+                        .reset_index()
+                        .head(10)
+                    )
+
+                    top_values.columns = [col, "Player Count"]
+
+                    st.dataframe(
+                        top_values,
+                        use_container_width=True,
+                        hide_index=True
+                    )
+
+    # its css
+    st.markdown("""
+<style>
+
+/* ================= DATASET PAGE ================= */
+
+/* Dataset Title */
+h1, h2, h3 {
+    color:#0B3C2D;
+    font-weight:800;
+}
+
+
+/* Dataset Description */
+.stText {
+    font-size:18px;
+    color:#555;
+}
+
+
+/* Dataset Information Cards */
+.dataset-info{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    margin:20px 0;
+}
+
+
+.dataset-info-item{
+    background:linear-gradient(135deg,#ffffff,#f4fff6);
+    padding:18px 25px;
+    border-radius:15px;
+    font-size:17px;
+    color:#1E293B;
+    font-weight:600;
+    border-left:6px solid #27AE60;
+    box-shadow:0 8px 20px rgba(0,0,0,0.12);
+    transition:0.3s;
+}
+
+
+.dataset-info-item:hover{
+    transform:translateY(-5px);
+    box-shadow:0 15px 30px rgba(39,174,96,0.25);
+}
+
+
+
+/* Tabs Styling */
+
+button[data-baseweb="tab"]{
+    font-size:17px;
+    font-weight:700;
+    color:#0B3C2D;
+}
+
+
+button[data-baseweb="tab"]:hover{
+    background:#E8F5E9;
+    border-radius:10px;
+}
+
+
+button[aria-selected="true"]{
+    background:#27AE60 !important;
+    color:white !important;
+    border-radius:10px;
+}
+
+
+
+/* Dataframe Styling */
+
+div[data-testid="stDataFrame"]{
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 8px 20px rgba(0,0,0,0.12);
+}
+
+
+
+/* Download Button */
+
+.stDownloadButton button{
+    background:#27AE60;
+    color:white;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:700;
+    padding:10px 20px;
+    border:none;
+    transition:0.3s;
+}
+
+
+.stDownloadButton button:hover{
+    background:#1E8449;
+    transform:translateY(-3px);
+}
+
+
+
+/* Expander Styling */
+
+.streamlit-expanderHeader{
+    background:#F1F8E9;
+    border-radius:12px;
+    font-size:17px;
+    font-weight:700;
+    color:#0B3C2D;
+}
+
+
+
+/* Slider Label */
+
+div[data-testid="stSlider"] label{
+    color:#0B3C2D;
+    font-weight:700;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# Preprocessing page
