@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from streamlit_option_menu import option_menu
+import plotly.express as px
 # Page Configuration
 st.set_page_config(
     page_title='Football Player Analytics',
@@ -8,8 +9,8 @@ st.set_page_config(
     page_icon='⚽',
     initial_sidebar_state='expanded'
 )
-df=pd.read_csv(r'C:\Users\ASUS\FootballPlayerAnalyticsProject\Streamlit2\FC26_cleaned.csv')
-
+# df=pd.read_csv(r'C:\Users\ASUS\FootballPlayerAnalyticsProject\Streamlit2\FC26_cleaned.csv')
+df=pd.read_csv(r'C:\Users\ASUS\FootballPlayerAnalyticsProject\Streamlit2\FC26_20250921.csv')
 
 st.markdown("""
 <style>
@@ -323,7 +324,7 @@ statistical summaries, and filtered data insights.
 
     # ---------- Tabs: Data | Columns | Summary ----------
     tab1, tab2, tab3 = st.tabs(['📂 Data Preview','📋 Column Information','📈 Summary'])
-    # TAB 1: DATA PREVIEW
+    # TAB 1: DATA PREVIEW - filtered data means data that you get after applying filters
     with tab1:
         col_left,col_right=st.columns([3,1])
         with col_left:
@@ -535,3 +536,214 @@ div[data-testid="stSlider"] label{
 """, unsafe_allow_html=True)
 
 # Preprocessing page
+
+
+elif opt=='🧹 Preprocessing':
+    st.title('🧹 Data Preprocessing Pipeline')
+    st.markdown("""
+This page demonstrates the preprocessing steps performed on the **FC26 Player Dataset**
+before building the analytics dashboard.
+
+The preprocessing pipeline improves data quality by handling missing values,
+removing unnecessary columns, correcting data types, and preparing the dataset
+for reliable visualizations and statistical analysis.
+""")
+    
+    st.subheader('📋 Processing Workflow')
+    steps = [
+    "1.\n📂 Raw\nDataset",
+    "2.\n🔍 Missing\nAnalysis",
+    "3.\n🗑️ Drop\nColumns",
+    "4.\n🧹 Handle\nMissing",
+    "5.\n🧾 Remove\nDuplicates",
+    "6.\n✔️ Validate\nTypes",
+    "7.\n📈 Growth\nFeature",
+    "8.\n✅ Clean\nDataset"
+]
+
+    cols = st.columns(len(steps))
+
+    for col, step in zip(cols, steps):
+        col.markdown(
+        f"""
+        <div style="
+        background:#27AE60;
+        color:white;
+        text-align:center;
+        padding:15px;
+        border-radius:10px;
+        font-weight:bold;">
+        {step.replace(chr(10), '<br>')} 
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    # char(10) is ASCII CODE of \n
+    
+    #  Helper function to get missing stats
+    def get_missing_stats(df):
+        missing_df=df.isna().sum().reset_index()
+        missing_df.columns=['Column Name','Missing Count']
+        missing_df['Missing %']=(missing_df['Missing Count']/len(df)*100).round(1)
+        missing_df=missing_df[missing_df['Missing Count']>0]
+        return missing_df
+    # Before Processing
+    st.markdown('<div class="custom-card">', unsafe_allow_html=True)
+    st.subheader('🔍 Dataset Before Processing')
+    col1 , col2 = st.columns([3,1])
+    with col1:
+        # show missing values table
+        missing_before=get_missing_stats(filtered)
+        if not missing_before.empty:
+            st.markdown('**Columns with missing values:**')
+            st.dataframe(
+                missing_before,
+                missing_before.style.format({
+                    'Missing Count':'{:,}',
+                    'Missing %':'{:.1f %}'
+                }),
+                use_container_width=True,
+                height=300
+            )
+        else:
+            st.success('✅ No missing values found!')
+    with col2:
+        # Show shape information
+        st.metric("Rows",filtered.shape[0])
+        st.metric("Columns",filtered.shape[1])
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Visualise missing values
+    if not missing_before.empty:
+       st.subheader('📊 Missing Values Before Preprocessing')
+       fig = px.bar(
+    missing_before,
+    x="Column Name",
+    y="Missing Count",
+    color="Missing Count",
+    color_continuous_scale="Viridis",
+    text="Missing Count",
+    # title="📊 Missing Values Before Preprocessing",
+    labels={
+        "Column Name": "Columns",
+        "Missing Count": "Missing Values"
+    },
+    template="plotly_white"
+)
+
+       fig.update_traces(
+    textposition="outside",
+    marker_line_color="black",
+    marker_line_width=1.2,
+    hovertemplate=
+    "<b>%{x}</b><br>"
+    "Missing Values: %{y}<extra></extra>"
+)
+
+       fig.update_layout(
+    # title={
+    #     "xanchor": "center",
+    #     "font": dict(size=24, color='black')
+    # },
+    xaxis=dict(
+        title="",
+        tickangle=-30,
+        showgrid=False,
+        tickfont=dict(size=12)
+    ),
+    yaxis=dict(
+        title="Number of Missing Values",
+        showgrid=True,
+        gridcolor="rgba(200,200,200,0.3)"
+    ),
+    coloraxis_showscale=True,
+    plot_bgcolor="white",
+    paper_bgcolor="white",
+    margin=dict(t=70, l=40, r=20, b=100),
+    height=600,
+    width=400,
+    hoverlabel=dict(
+        bgcolor="white",
+        font_size=13,
+        font_family="Arial"
+    )
+)
+
+    st.plotly_chart(fig, use_container_width=True)
+    st.info(
+    """
+📌 **Dropped Columns:** `club_jersey_number`, `club_loaned_from`, `club_team_id`,
+`goalkeeping_speed`, `nation_jersey_number`, `nation_position`, `nation_team_id`,
+`player_tags`, `player_traits`, and `work_rate`.
+
+These features were removed because they contained many missing values, served mainly
+as identifiers, or were not essential for the analyses and visualizations presented
+in this dashboard.
+"""
+)    
+    # Perform Cleaning
+    # Use a copy to avoid modifying the original filtered data
+    processed_data=filtered.copy()
+    cols_to_drop=['club_jersey_number','club_loaned_from','club_team_id','goalkeeping_speed','nation_jersey_number','nation_position','nation_team_id','player_tags','player_traits','work_rate']
+    existing_cols=[c for c in cols_to_drop if c in processed_data.columns]
+    processed_data.drop(columns=existing_cols,inplace=True,errors='ignore')
+
+    rows_before=processed_data.shape[0]
+    processed_data.dropna(inplace=True)
+    rows_after=processed_data.shape[0]
+    processed_data.reset_index(drop=True,inplace=True)
+
+
+    #  After Processing
+    st.subheader("✅ After Processing")
+    st.markdown(
+    f"""
+    The preprocessing removed **{len(existing_cols)} columns** and
+    **{rows_before - rows_after:,} rows** containing missing values.
+
+    **Final Dataset:** **{rows_after:,} rows × {len(existing_cols)} columns**
+    """
+)   
+
+    col1 , col2, col3 =st.columns(3)
+    with col1:
+            st.metric("Rows After Cleaning", rows_after, delta=rows_after - rows_before, delta_color="inverse")
+    with col2:
+        st.metric("Columns Remaining", processed_data.shape[1])
+    with col3:
+        st.metric("Rows Removed", rows_before - rows_after, delta="-{}".format(rows_before - rows_after))
+
+    # Show missing values again (should be all zeros)
+    missing_after =get_missing_stats(processed_data)
+    st.markdown("**Missing values after cleaning:**")
+    if missing_after.empty:
+        st.success("🎉 No missing values remaining!")
+    else:
+        st.dataframe(missing_after, use_container_width=True)
+
+    with st.expander("Preview of Cleaned Data"):
+        st.dataframe(processed_data.head(10), use_container_width=True)
+
+    # ---------- Download Cleaned Data ----------
+    csv_clean = processed_data.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="📥 Download Cleaned Data (CSV)",
+        data=csv_clean,
+        file_name="footballplayeranalytics_cleaned.csv",
+        mime="text/csv",
+        use_container_width=True,
+    )
+
+    # ---------- Side note: storing cleaned data for other pages ----------
+    # We'll store it in session_state so Visualization can use it directly
+    st.session_state['cleaned_data'] = processed_data
+    st.success(
+"""
+🎉 Data preprocessing completed successfully!
+
+The cleaned dataset has been saved and is now available
+for all visualization pages.
+"""
+)
+
+    # styling left + visualization + its page + about page + deploy + github + understand and read logic + prep each line
