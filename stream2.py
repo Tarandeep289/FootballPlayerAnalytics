@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 from streamlit_option_menu import option_menu
 import plotly.express as px
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 # Page Configuration
 st.set_page_config(
@@ -12,7 +15,8 @@ st.set_page_config(
 )
 
 # Load data
-df = pd.read_csv(r'C:\Users\ASUS\FootballPlayerAnalyticsProject\Streamlit2\FC26_20250921.csv')
+# df = pd.read_csv(r'C:\Users\ASUS\FootballPlayerAnalyticsProject\Streamlit2\FC26_20250921.csv')
+df = pd.read_csv(BASE_DIR / 'FC26_20250921.csv')
 
 st.markdown("""
 <style>
@@ -212,10 +216,14 @@ if opt == 'Home':
         </p>
     </div>
     """, unsafe_allow_html=True)
+    # st.image(
+    #     r"C:\Users\ASUS\FootballPlayerAnalyticsProject\Streamlit2\football-stadium-inside-at-night-with-lights-post-production-free-photo.jpg",
+    #     use_container_width=True
+    # )
     st.image(
-        r"C:\Users\ASUS\FootballPlayerAnalyticsProject\Streamlit2\football-stadium-inside-at-night-with-lights-post-production-free-photo.jpg",
-        use_container_width=True
-    )
+    BASE_DIR / "football-stadium-inside-at-night-with-lights-post-production-free-photo.jpg",
+    use_container_width=True
+)
     
     players = filtered['short_name'].shape[0]
     leagues = filtered['league_name'].nunique()
