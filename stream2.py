@@ -182,7 +182,13 @@ div[data-testid="stDataFrame"]{
 
 # Sidebar Routing
 with st.sidebar:
-    opt = option_menu(menu_title='Menu', options=['🏠 Home', '📄 Dataset', '🧹 Preprocessing', '📊 Visualizations', 'ℹ About'])
+    # opt = option_menu(menu_title='Menu', options=['🏠 Home', '📄 Dataset', '🧹 Preprocessing', '📊 Visualizations', 'ℹ About'])
+    opt = option_menu(
+    menu_title='Menu',
+    options=['Home', 'Dataset', 'Preprocessing', 'Visualizations', 'About'],
+    icons=['house', 'file-text', 'tools', 'bar-chart-line', 'info-circle'],
+    default_index=0,
+    menu_icon="cast")
     st.markdown('---')
     st.subheader('🔍 Filters')
     league = st.multiselect('Select league 🌍', options=df['league_name'].dropna().unique())
@@ -195,7 +201,7 @@ with st.sidebar:
         filtered = filtered[filtered['club_name'].isin(club)]
 
 # Home page
-if opt == '🏠 Home':
+if opt == 'Home':
     st.markdown("""
     <div style="text-align:center; padding:15px;">
         <h1 style="font-size:52px; margin-bottom:10px; text-shadow:2px 2px 8px rgba(0,0,0,0.15);">
@@ -240,7 +246,7 @@ if opt == '🏠 Home':
         st.markdown(f'<div class="kpi-card"><div class="kpi-icon">💵</div><div class="kpi-title">Total Weekly Wages</div><div class="kpi-value">€{total_wages/1e9:.2f}B</div></div>', unsafe_allow_html=True)
 
 # Dataset page
-elif opt == '📄 Dataset':
+elif opt == 'Dataset':
     st.markdown("""
     <div style="text-align:center; padding:10px;">
         <h1 style="font-size:45px;">📊 Dataset Explorer</h1>
@@ -312,7 +318,7 @@ elif opt == '📄 Dataset':
                         st.dataframe(top_values, use_container_width=True, hide_index=True)
 
 # Preprocessing page
-elif opt == '🧹 Preprocessing':
+elif opt == 'Preprocessing':
     st.markdown("""
     <div style="text-align:center; padding:10px;">
         <h1 style="font-size:45px;">🧹 Data Preprocessing Pipeline</h1>
@@ -460,7 +466,7 @@ elif opt == '🧹 Preprocessing':
 
     st.session_state['cleaned_data'] = processed_data
 
-elif opt=='📊 Visualizations':
+elif opt=='Visualizations':
 
     # -----------------------------------------------------
     # HEADER (matching Home / Dataset / Preprocessing style)
@@ -528,29 +534,72 @@ elif opt=='📊 Visualizations':
             # GRAPH 1 : PLAYER VALUE DISTRIBUTION
             st.markdown("### 📊 Player Market Value Distribution")
 
-            fig1 = px.histogram(
-                data_frame=plot_data,
-                x="value_eur",
-                nbins=12,
-                template="plotly_white",
-                color_discrete_sequence=px.colors.qualitative.Set2,
-                opacity=0.85,
-            )
-            fig1.update_traces(
-                marker=dict(line=dict(color="black", width=1)),
-                hovertemplate="<b>Market Value:</b> €%{x:,.0f}<br><b>Players:</b> %{y}<extra></extra>",
-            )
-            fig1.update_layout(
-                xaxis=dict(title="Player Market Value (€)", showgrid=True, gridcolor="lightgray",
-                           gridwidth=1, zeroline=False, tickformat=","),
-                yaxis=dict(title="Number of Players", showgrid=True, gridcolor="lightgray",
-                           gridwidth=1, zeroline=False),
-                width=800, height=550,
-                font=dict(family="Arial", size=14, color="#55555E"),
-                bargap=0.04, hovermode="x unified",
-                margin=dict(l=70, r=40, t=40, b=70),
-            )
-            st.plotly_chart(fig1, use_container_width=True)
+            fig = px.histogram(
+            data_frame=df,
+            x="value_eur",
+            nbins=12,
+            # title="Player Value Distribution Matrix",
+            template="plotly_white",
+            color_discrete_sequence=px.colors.qualitative.Set2,
+            opacity=0.85
+        )
+
+            fig.update_traces(
+    marker=dict(
+        line=dict(color="black", width=1)
+    ),
+    hovertemplate=
+    "<b>Market Value:</b> €%{x:,.0f}<br>"
+    "<b>Players:</b> %{y}<extra></extra>"
+)
+
+            fig.update_layout(
+    # title=dict(
+    #     text="Player Value Distribution Matrix",
+    #     x=0.5,
+    #     xanchor="center",
+    #     font=dict(size=24, family="Arial", color="#0B0C0C")
+    # ),
+
+    xaxis=dict(
+        title="Player Market Value (€)",
+        showgrid=True,
+        gridcolor="lightgray",
+        gridwidth=1,
+        zeroline=False,
+        tickformat=","
+    ),
+
+    yaxis=dict(
+        title="Number of Players",
+        showgrid=True,
+        gridcolor="lightgray",
+        gridwidth=1,
+        zeroline=False
+    ),
+
+    width=700,
+    height=500,
+
+    font=dict(
+        family="Arial",
+        size=14,
+        color="#55555E"
+    ),
+
+    bargap=0.04,
+    hovermode="x unified",
+
+    margin=dict(
+        l=70,
+        r=40,
+        t=80,
+        b=70
+    ),
+)
+
+            # fig.show()
+            st.plotly_chart(fig, use_container_width=True)
 
             st.info("""
             💡 **Insight:** The football market follows a highly uneven distribution. 
@@ -561,37 +610,85 @@ elif opt=='📊 Visualizations':
             # GRAPH 2 : OVERALL VS MARKET VALUE
             st.markdown("### 📈 Overall Rating vs Market Value")
 
-            fig2 = px.scatter(
-                plot_data,
-                x="overall",
-                y="value_eur",
-                color="age",
-                template="plotly_white",
-                color_continuous_scale="Viridis",
-                opacity=0.75,
-                hover_data={"short_name": True, "club_name": True, "overall": True,
-                            "value_eur": ":,", "age": True},
-            )
-            fig2.update_traces(
-                marker=dict(line=dict(color="white", width=0.5), symbol="triangle-up", size=10),
-                hovertemplate=(
-                    "<b>%{customdata[0]}</b><br>Club: %{customdata[1]}<br>"
-                    "Overall Rating: %{x}<br>Market Value: €%{y:,.0f}<br>"
-                    "Age: %{marker.color}<extra></extra>"
-                ),
-            )
-            fig2.update_layout(
-                xaxis_title="Overall Rating",
-                yaxis_title="Market Value (€)",
-                width=900, height=550,
-                font=dict(family="Arial", size=14),
-                margin=dict(l=70, r=40, t=40, b=70),
-                hovermode="closest",
-                coloraxis_colorbar=dict(title="Age"),
-            )
-            fig2.update_xaxes(showgrid=True, gridcolor="lightgray", showline=True, linewidth=1, linecolor="black")
-            fig2.update_yaxes(showgrid=True, gridcolor="lightgray", tickformat=",", showline=True, linewidth=1, linecolor="black")
-            st.plotly_chart(fig2, use_container_width=True)
+            fig=px.scatter(df,
+               x='overall',
+               y='value_eur',
+               color='age',
+               template='plotly_white',
+            #  title='Relationship between overall rating and market value',
+               color_continuous_scale='Viridis', # applies for numerical data else legend or color_discrete_sequence for categorical
+               opacity=0.75,
+               hover_data={
+                   "short_name":True,
+                   "club_name":True,
+                   "overall":True,
+                   'value_eur':":,",
+                   'age':True   
+               })
+            fig.update_traces(
+    marker=dict(
+        line=dict(color='white',width=0.5),
+        symbol='triangle-up',
+        size=10
+    ),
+    hovertemplate=(
+           "<b>%{customdata[0]}</b><br>" +
+    "Club: %{customdata[1]}<br>" +
+    "Overall Rating: %{x}<br>" +
+    "Market Value: €%{y:,.0f}<br>" +
+    "Age: %{marker.color}<extra></extra>"
+    ),
+)
+            fig.update_layout(
+    # title=dict(
+    #     text="Relationship Between Overall Rating and Market Value",
+    #     x=0.5,
+    #     font=dict(size=24)
+    # ),
+
+    xaxis_title="Overall Rating",
+    yaxis_title="Market Value (€)",
+
+    width=700,
+    height=500,
+
+    font=dict(
+        family="Arial",
+        size=14
+    ),
+
+    margin=dict(
+        l=70,
+        r=40,
+        t=80,
+        b=70
+    ),
+
+    hovermode="closest",
+
+    coloraxis_colorbar=dict(
+        title="Age"
+    )
+)
+
+            fig.update_xaxes(
+    showgrid=True,
+    gridcolor="lightgray",
+    showline=True,
+    linewidth=1,
+    linecolor="black",
+)
+
+            fig.update_yaxes(
+    showgrid=True,
+    gridcolor="lightgray",
+    tickformat=",",
+    showline=True,
+    linewidth=1,
+    linecolor="black",
+)
+            # fig.show()
+            st.plotly_chart(fig, use_container_width=True)
 
             st.info("""
             💡 **Insight:** Market value increases sharply when players cross higher overall ratings. 
@@ -608,27 +705,49 @@ elif opt=='📊 Visualizations':
                 .sort_values(by="wage_eur", ascending=False)
                 .head(15)
             )
+            club_wages = (
+    df.groupby("club_name")["wage_eur"]
+      .sum()
+      .reset_index()
+      .sort_values(by="wage_eur", ascending=False)
+      .head(15)
+)
 
-            fig3 = px.bar(
-                club_wages,
-                x="wage_eur",
-                y="club_name",
-                orientation="h",
-                color="wage_eur",
-                color_continuous_scale="Viridis",
-                text="wage_eur",
-                template="plotly_white",
-            )
-            fig3.update_traces(texttemplate="€%{text:,.0f}", textposition="outside")
-            fig3.update_layout(
-                xaxis_title="Total Wage (€)",
-                yaxis_title="Club Name",
-                showlegend=False,
-                height=580, width=800,
-                margin=dict(l=180, r=40, t=40, b=60),
-            )
-            fig3.update_yaxes(categoryorder="total ascending", showline=True, linewidth=1, linecolor="black")
-            st.plotly_chart(fig3, use_container_width=True)
+            fig = px.bar(
+    club_wages,
+    x="wage_eur",
+    y="club_name",
+    orientation="h",
+    color="wage_eur",
+    color_continuous_scale="Viridis",
+    text="wage_eur",
+    template="plotly_white",
+    # title="Top 15 Clubs by Aggregate Wage Commitments"
+)
+
+            fig.update_traces(
+    texttemplate="€%{text:,.0f}",
+    textposition="outside"
+)
+
+            fig.update_layout(
+    # title_x=0.5,
+    xaxis_title="Total Wage (€)",
+    yaxis_title="Club Name",
+    showlegend=False,
+    height=650,
+    width=1000,
+    margin=dict(l=180, r=40, t=80, b=60)
+)
+
+            fig.update_yaxes(categoryorder="total ascending", showline=True,
+    linewidth=1,
+    linecolor="black")
+
+            # fig.show()
+
+            
+            st.plotly_chart(fig, use_container_width=True)
 
             st.info("""
             💡 **Insight:** Wage spending is concentrated among football's biggest clubs. 
@@ -1050,32 +1169,93 @@ elif opt=='📊 Visualizations':
             # GRAPH 13
             st.markdown("### 💵 Wage Efficiency: Weekly Wage vs Potential")
 
+            # fig13 = px.scatter(
+            #     plot_data,
+            #     x="wage_eur",
+            #     y="potential",
+            #     color="overall",
+            #     hover_name="short_name",
+            #     template="plotly_white",
+            #     hover_data=["club_name", "league_name", "age", "overall"],
+            #     color_continuous_scale="Viridis",
+            # )
+            # fig13.update_traces(
+            #     marker=dict(size=7, line=dict(color="black", width=0.5), symbol="square"),
+            #     hovertemplate="<b>%{hovertext}</b><br>Weekly Wage: €%{x:,.0f}<br>Potential: %{y}<br>"
+            #                   "Club: %{customdata[0]}<br>League: %{customdata[1]}<br>"
+            #                   "Age: %{customdata[2]}<br>Overall: %{customdata[3]}<extra></extra>",
+            # )
+            # fig13.update_layout(
+            #     height=550, width=800,
+            #     xaxis_title="Weekly Wage (€)",
+            #     yaxis_title="Potential Rating",
+            #     coloraxis_colorbar=dict(title="Overall"),
+            #     font=dict(family="Arial", size=14),
+            #     margin=dict(l=70, r=40, t=40, b=70),
+            # )
+            # fig13.update_xaxes(showgrid=False, showline=True, linecolor="black")
+            # fig13.update_yaxes(showgrid=True, gridcolor="lightgray", showline=True, linecolor="black", range=[0, 100])
+            # st.plotly_chart(fig13, use_container_width=True)
             fig13 = px.scatter(
-                plot_data,
-                x="wage_eur",
-                y="potential",
-                color="overall",
-                hover_name="short_name",
-                template="plotly_white",
-                hover_data=["club_name", "league_name", "age", "overall"],
-                color_continuous_scale="Viridis",
-            )
+    plot_data,
+    x="wage_eur",
+    y="potential",
+    color="overall",
+    hover_name="short_name",
+    template="plotly_white",
+    color_continuous_scale="Viridis",
+    hover_data=[
+        "club_name",
+        "league_name",
+        "age",
+        "overall"
+    ]
+)
+
             fig13.update_traces(
-                marker=dict(size=7, line=dict(color="black", width=0.5), symbol="square"),
-                hovertemplate="<b>%{hovertext}</b><br>Weekly Wage: €%{x:,.0f}<br>Potential: %{y}<br>"
-                              "Club: %{customdata[0]}<br>League: %{customdata[1]}<br>"
-                              "Age: %{customdata[2]}<br>Overall: %{customdata[3]}<extra></extra>",
-            )
+    marker=dict(
+        size=5,
+        opacity=0.45,
+        line=dict(
+            width=0.3,
+            color="white"
+        )
+    )
+)
+
+            fig13.update_xaxes(
+    type="log",# log is useful because wages are typically very right-skewed.
+    title="Weekly Wage (€)",
+    showgrid=True,
+    gridcolor="lightgray"
+)
+
+            fig13.update_yaxes(
+    title="Potential Rating",
+    range=[50, 100],
+    dtick=5,
+    showgrid=True,
+    gridcolor="lightgray"
+)
+
             fig13.update_layout(
-                height=550, width=800,
-                xaxis_title="Weekly Wage (€)",
-                yaxis_title="Potential Rating",
-                coloraxis_colorbar=dict(title="Overall"),
-                font=dict(family="Arial", size=14),
-                margin=dict(l=70, r=40, t=40, b=70),
-            )
-            fig13.update_xaxes(showgrid=False, showline=True, linecolor="black")
-            fig13.update_yaxes(showgrid=True, gridcolor="lightgray", showline=True, linecolor="black", range=[0, 100])
+    height=550,
+    paper_bgcolor="#F8FAFC",
+    plot_bgcolor="white",
+    font=dict(
+        family="Arial",
+        size=13
+    ),
+    margin=dict(
+        l=70,
+        r=70,
+        t=50,
+        b=70
+    )
+)
+            fig13.update_xaxes(showline=True, linecolor="black")
+            fig13.update_yaxes(showgrid=True, gridcolor="lightgray", showline=True, linecolor="black", )
+
             st.plotly_chart(fig13, use_container_width=True)
 
             st.info("""
@@ -1168,7 +1348,7 @@ elif opt=='📊 Visualizations':
             - **Elite Talent Premium:** Highlights the steep financial premium required to acquire world-class players.
             """)
 
-elif opt == "ℹ About":
+elif opt == "About":
 
     # -----------------------------------------------------
     # HEADER
@@ -1285,7 +1465,6 @@ elif opt == "ℹ About":
         FC26 Player Analytics Dashboard • Powered by Streamlit & Plotly
     </div>
     """, unsafe_allow_html=True)
-
 
 
 
